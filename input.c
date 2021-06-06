@@ -9,6 +9,7 @@
 #include "input.h"
 #include "render.h"
 #include "write.h"
+#include "oga_input.h"
 
 #define MAX_CONTROLLERS 4
 
@@ -47,10 +48,12 @@ int initialize_game_controllers() {
   SDL_Delay(1); // Some controllers like XBone wired need a little while to get ready
   // Open all available game controllers
   for (int i = 0; i < num_joysticks; i++) {
-    if (!SDL_IsGameController(i))
+    if (!SDL_IsGameController(i)) {
       continue;
-    if (controller_index >= MAX_CONTROLLERS)
+    }
+    if (controller_index >= MAX_CONTROLLERS) {
       break;
+    }
     game_controllers[controller_index] = SDL_GameControllerOpen(i);
     SDL_Log("Controller %d: %s",controller_index+1,SDL_GameControllerName(game_controllers[controller_index]));
     controller_index++;
@@ -234,8 +237,7 @@ static input_msg_s handle_normal_keys(SDL_Event *event, uint8_t keyvalue) {
   return key;
 }
 
-static input_msg_s handle_game_controller_buttons(SDL_Event *event,
-                                                  uint8_t keyvalue) {
+static input_msg_s handle_game_controller_buttons(SDL_Event *event, uint8_t keyvalue) {
   input_msg_s key = {normal, keyvalue};
   switch (event->cbutton.button) {
 
@@ -277,6 +279,57 @@ static input_msg_s handle_game_controller_buttons(SDL_Event *event,
   }
 
   return key;
+}
+
+
+static input_msg_s handle_oga_buttons(SDL_Event *event, uint8_t keyvalue) {
+    SDL_Log("joybtn down: %d\n ", (int)event->jbutton.button);
+    input_msg_s key = {normal, keyvalue};
+    switch (event->jbutton.button) {
+        case OGA_PAD_UP:
+            key.value = key_up;
+            break;
+
+        case OGA_PAD_DOWN:
+            key.value = key_down;
+            break;
+
+        case OGA_PAD_LEFT:
+            key.value = key_left;
+            break;
+
+        case OGA_PAD_RIGHT:
+            key.value = key_right;
+            break;
+
+        case OGA_BTN5:
+            key.value = key_select;
+            break;
+
+        case OGA_BTN6:
+            key.value = key_start;
+            break;
+
+        case OGA_JOY_B:
+            key.value = key_edit;
+            break;
+
+        case OGA_JOY_A:
+            key.value = key_opt;
+            break;
+
+        case OGA_BTN1:
+            key.type = special; 
+            key.value = msg_quit;
+            break;
+
+        default:
+            key.value = 0;
+            break;
+    }
+
+    return key;
+
 }
 
 // Handles SDL input events
@@ -333,14 +386,25 @@ void handle_sdl_events() {
   case SDL_CONTROLLERBUTTONUP:
     key = handle_game_controller_buttons(&event, 0);
     break;
-
+  // DMS OGA joystick api ------
+  //
+  case SDL_JOYAXISMOTION:
+    // event.jaxis.value, .axis
+    // std::cout << "joyaxis: " << int(m_window_event.jaxis.axis) << ", val: " << m_window_event.jaxis.value << std::endl;
+    break;
+  case SDL_JOYBUTTONDOWN:
+  case SDL_JOYBUTTONUP:
+    key = handle_oga_buttons(&event, 0);
+    break;
   default:
     break;
   }
 
+  //SDL_Log("key type: %d, value: %d, keycode: %d\n", key.type, key.value, keycode);
+
   // Do not allow pressing multiple keys with keyjazz
   if (key.type == normal) {
-    if (event.type == SDL_KEYDOWN || event.type == SDL_CONTROLLERBUTTONDOWN)
+    if (event.type == SDL_KEYDOWN || event.type == SDL_CONTROLLERBUTTONDOWN || event.type == SDL_JOYBUTTONDOWN)
       keycode |= key.value;
     else
       keycode &= ~key.value;
@@ -350,6 +414,8 @@ void handle_sdl_events() {
     else
       keycode = 0;
   }
+
+  //SDL_Log("keycode: %d\n", keycode);
 }
 
 // Returns the currently pressed keys to main
