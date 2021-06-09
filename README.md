@@ -102,3 +102,27 @@ The driver can be enabled with ```sudo raspi-config``` and selecting "Advanced o
 Please note that with some configurations (for example, composite video) this can lead to not getting video output at all. If that happens, you can delete the row ```dtoverlay=vc4-kms-v3d``` in bottom of /boot/config.txt.
 
 Further performance improvement can be achieved by not using X11 and running the program directly in framebuffer console, but this might require doing a custom build of SDL.
+
+
+-----------
+
+everything above this line is original readme
+
+### notes on this fork
+
+- made some tiny changes to make m8c work with my odroid go advance. I just hacked in a joystick device for the OGA buttons (didn't use the actual joystick, just DPAD). super simple and not very elegant, I'm not that familiar with SDL
+- B is edit, A is option, the last two buttons on the bottom of the screen are shift/select and start
+- you still need to use alsa/jack for audio, same as in Pi, etc. it "works" with headphones and speaker. "works" is in quotes because so far sound is glitchy.
+- teensy has to go in the USB-A host port, not the USB-C port that does power
+- my observations so far:
+    - it's actually fairly usable
+    - the OGA's audio is fairly bad. beside the glitchiness (probably due to overtaxed CPU?) it's also just tinny and lifeless (this has nothing to with M8 -- the OGA is a device made for gaming, not serious audio. it sounds way better on my main desktop)
+    - the display looks a bit wonky (aliasing artifacts) because the aspect ratios don't match. Same as with NES and other consoles except for GBA. Sad!
+    - buttons on OGA are OK to mediocre, but we all knew that already
+    - even with all these issues it's still pretty fun and has made me eager to get real m8
+- this is in no way a replacement for a real m8, or even comparable! with real m8 you get
+    - 1000% better audio. The m8 makes great sounds, the OGA DAC doesn't do them justice!
+    - nice display that actually matches aspect ratio of software and even a touch surface
+    - no fiddling around with alsa/jack/m8c/whatever to get it running
+    - high quality key switches, not plasticky buttons
+    - probably more battery life
