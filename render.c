@@ -29,8 +29,10 @@ int initialize_sdl() {
 
   ticks = SDL_GetTicks();
 
-  const int window_width = 640;  // SDL window width
-  const int window_height = 480; // SDL window height
+  //const int window_width = 640;  // SDL window width
+  //const int window_height = 480; // SDL window height
+  const int window_width = 480;  // SDL window width
+  const int window_height = 320; // SDL window height
 
   if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
     SDL_LogCritical(SDL_LOG_CATEGORY_ERROR, "SDL_Init: %s\n", SDL_GetError());
