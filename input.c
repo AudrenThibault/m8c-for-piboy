@@ -306,6 +306,14 @@ static input_msg_s handle_oga_buttons(SDL_Event *event, uint8_t keyvalue) {
             key.value = key_select;
             break;
 
+        case OGA_JOY_X:
+            key.value = key_select;
+            break;
+
+        case OGA_JOY_Y:
+            key.value = key_select;
+            break;
+
         case OGA_BTN6:
             key.value = key_start;
             break;
